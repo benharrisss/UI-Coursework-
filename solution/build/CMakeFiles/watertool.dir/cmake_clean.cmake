@@ -18,8 +18,6 @@ file(REMOVE_RECURSE
   "CMakeFiles/watertool.dir/window.cpp.o.d"
   "watertool"
   "watertool.pdb"
-  "watertool_autogen/mocs_compilation.cpp"
-  "watertool_autogen/timestamp"
 )
 
 # Per-language clean rules from dependency scanning.

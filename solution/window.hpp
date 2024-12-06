@@ -5,6 +5,9 @@
 #include <QMainWindow>
 #include "model.hpp"
 #include "water.hpp"
+#include<QtCharts>
+#include<QtWidgets>
+
 
 class QString;
 class QComboBox;
@@ -51,7 +54,11 @@ private:
 
   QLabel *pollutantName;
 
-  QLabel *pop;
+  QWidget *pops;
+  QChart *popChart;
+  QChartView *popsChartView;
+  QScatterSeries *popSeries;
+  QVBoxLayout *popsLayout;
 
 private slots:
   void setDataLocation();

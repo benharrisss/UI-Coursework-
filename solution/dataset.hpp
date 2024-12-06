@@ -13,6 +13,8 @@ public:
   void loadData(const std::string &);
   int size() const { return data.size(); }
   Water operator[](int index) const { return data.at(index); }
+
+  void getPOP() {}
   /*
   Quake strongest() const;
   Quake shallowest() const;

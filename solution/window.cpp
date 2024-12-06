@@ -6,6 +6,8 @@
 #include "window.hpp"
 #include "stats.hpp"
 #include "water.hpp"
+#include<QtCharts>
+
 
 static const int MIN_WIDTH = 620;
 
@@ -41,9 +43,31 @@ void WaterWindow::createTest()
 
 void WaterWindow::createPOPs()
 {
-  pop = new QLabel("hello world");
-  setCentralWidget(pop);
+  auto popsChart = new QChart;
 
+  auto popSeries = new QScatterSeries();
+  popSeries->setName("POPs Overview");
+  popSeries->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+  popSeries->setMarkerSize(15.0);
+  popSeries->append(0, 6);
+  popSeries->append(2, 4);
+  popSeries->append(3, 8);
+  popSeries->append(7, 4);
+  popSeries->append(10, 5);
+  
+  popsChart->addSeries(popSeries);
+  popsChart->setTitle("POPs Overview");
+  popsChart->createDefaultAxes();
+  
+  auto popsChartView = new QChartView(popsChart);
+
+  auto popsLayout = new QVBoxLayout();
+  popsLayout->addWidget(popsChartView);
+  pops = new QWidget();
+  pops->setLayout(popsLayout);
+  //pops->addWidget(popsChart);
+  
+  setCentralWidget(pops);
 }
 
 void WaterWindow::createPageBar()

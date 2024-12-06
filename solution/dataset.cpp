@@ -65,6 +65,11 @@ void WaterDataset::loadData(const string &filename)
   }
 }
 
+void WaterDataset::getPOP()
+{
+  checkDataExists();
+  
+}
 /*
 Quake QuakeDataset::strongest() const
 {
