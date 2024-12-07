@@ -21,11 +21,12 @@ public:
   int columnCount(const QModelIndex &index) const { return 17; }
   QVariant data(const QModelIndex &, int) const;
   QVariant headerData(int, Qt::Orientation, int) const;
+  WaterDataset getDataset() const { return dataset; }
   /*
   double meanDepth() const { return dataset.meanDepth(); }
   double meanMagnitude() const { return dataset.meanMagnitude(); }
   */
 
-private:
+//private:
   WaterDataset dataset;
 };
