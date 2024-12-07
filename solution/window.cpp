@@ -6,7 +6,14 @@
 #include "window.hpp"
 #include "stats.hpp"
 #include "water.hpp"
-#include<QtCharts>
+#include <QtCharts>
+#include"dataset.hpp"
+#include <string>
+#include <utility>
+#include <vector>
+#include <map>
+
+using namespace std;
 
 
 static const int MIN_WIDTH = 620;
@@ -32,9 +39,13 @@ WaterWindow::WaterWindow() : QMainWindow(), statsDialog(nullptr)
 
 void WaterWindow::createTest()
 {
+  string popsList[] = {"PCB Con 028", "PCB Con 105", "PCB Con 052", "PCB Con 101",
+  "PCB Con 138", "PCB Con 156", "PCB Con 118", "PCB Con 153", "PCB Con 180"};
+
+  selectOptions(popsList, end(popsList) - begin(popsList));
+
   table = new QTableView();
   table->setModel(&model);
-
   QFont tableFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
   table->setFont(tableFont);
 
@@ -43,17 +54,27 @@ void WaterWindow::createTest()
 
 void WaterWindow::createPOPs()
 {
-  auto popsChart = new QChart;
+  string popsList[] = {"PCB Con 028", "PCB Con 105", "PCB Con 052", "PCB Con 101",
+  "PCB Con 138", "PCB Con 156", "PCB Con 118", "PCB Con 153", "PCB Con 180"};
 
-  auto popSeries = new QScatterSeries();
+  selectOptions(popsList, end(popsList) - begin(popsList));
+
+  string currentPollutant = pollutant->currentText().toStdString();
+  string currentlocation = location->currentText().toStdString();
+  vector<pair<string, double>> pollutantInfo = model.getDataset().getPollutants(currentPollutant, currentlocation);
+  map<string, vector<double>> dateData;
+  for (int i = 0; i < pollutantInfo.size(); i++) {
+    //for(int j = 0; j < dateData.size(); j++) {
+      //if (dateData.find(pollutantInfo[i].first) == date.end()) {
+      //  dateData[]
+      //}
+    //}
+    dateData[pollutantInfo[i].first].push_back(pollutantInfo[i].second);
+  }
+
+  auto *popsChart = new QChart;
+  auto *popSeries = new QBarSeries();
   popSeries->setName("POPs Overview");
-  popSeries->setMarkerShape(QScatterSeries::MarkerShapeCircle);
-  popSeries->setMarkerSize(15.0);
-  popSeries->append(0, 6);
-  popSeries->append(2, 4);
-  popSeries->append(3, 8);
-  popSeries->append(7, 4);
-  popSeries->append(10, 5);
   
   popsChart->addSeries(popSeries);
   popsChart->setTitle("POPs Overview");
@@ -68,6 +89,55 @@ void WaterWindow::createPOPs()
   //pops->addWidget(popsChart);
   
   setCentralWidget(pops);
+}
+
+void WaterWindow::selectOptions(string pollutantList[], int size)
+{
+  vector<string> locations;
+  bool exists = false;
+
+  pollutant = new QComboBox();
+  location = new QComboBox();  //TODO: MAKE A GETLOCATION FUNCTION FOR A GIVEN POLLUTANT
+  for(int i = 0; i < size; i++) {
+    pollutant->addItem(QString::fromStdString(pollutantList[i]));
+
+    /*for(string j : locations) {
+        if (pollutantList[i]==j) {
+          exists = true;
+        }
+    }
+    if (exists == false) {
+      locations.push_back(pollutantList[i]);
+      location->addItem(QString::fromStdString(pollutantList[i]));
+    }
+    exists = false;*/
+  }
+  connect(pollutant, SIGNAL(activated(int)), this, SLOT(updateLocations()));
+}
+
+void WaterWindow::updateLocations()
+{
+  location->clear();
+  cout << "UPDATING LOCATION DROP-DOWN" << endl;
+  vector<string> locations;
+  bool exists = false;
+  for (int i = 0; i < pollutant->count(); i++) {
+    for (string j : (model.getDataset().getLocations(pollutant->itemText(i).toStdString()))) {
+      for (string l : locations) {
+        if (j == l) {
+          exists = true;
+        }
+      }
+      if (exists == false) {
+        locations.push_back(j);
+        location->addItem(QString::fromStdString(j));
+        cout << location->itemText(location->count()-1).toStdString() << endl; //cout gives correct output but nothing appears on screen
+      }
+      exists = false;
+    }
+  }
+  location->update();
+  //toolBar->addWidget(location);
 }
 
 void WaterWindow::createPageBar()
@@ -88,15 +158,25 @@ void WaterWindow::createPageBar()
 // change this
 void WaterWindow::createFileSelectors()
 {
-  QStringList pollutantOptions;
-  pollutantOptions << "pollutants";
-  pollutant = new QComboBox();
-  pollutant->addItems(pollutantOptions);
+  //QStringList pollutantOptions;
+  //pollutantOptions << "pollutants";
+  /*std::vector<Water> pollutantsVector = model.dataset.getData();
+  for (int i = 0; i < pollutantsVector.size(); i++) {
+    pollutantOptions.append(pollutantsVector[i].getDeterminand().getLabel())
+  }*/
+  /*pollutant = new QComboBox();
+  for(std::string i : model.dataset.getLabels()) {
+    QMessageBox test;
+    test.setText(QString::fromStdString(i));
+    test.exec();
+    pollutant->addItem(QString::fromStdString(i));
+  }*/
+  //pollutant->addItems(pollutantOptions);
 
-  QStringList periodOptions;
-  periodOptions << "hour" << "day" << "week" << "month";
-  period = new QComboBox();
-  period->addItems(periodOptions);
+  /*QStringList locationOptions;
+  locationOptions << "hour" << "day" << "week" << "month";
+  location = new QComboBox();
+  location->addItems(locationOptions);*/
 }
 
 void WaterWindow::createButtons()
@@ -121,17 +201,17 @@ void WaterWindow::createButtons()
 
 void WaterWindow::createToolBar()
 {
-  QToolBar *toolBar = new QToolBar();
+  toolBar = new QToolBar();
 
   QLabel *pollutantLabel = new QLabel("Pollutant");
   pollutantLabel->setAlignment(Qt::AlignVCenter);
   toolBar->addWidget(pollutantLabel);
   toolBar->addWidget(pollutant);
 
-  QLabel *periodLabel = new QLabel("Period");
-  periodLabel->setAlignment(Qt::AlignVCenter);
-  toolBar->addWidget(periodLabel);
-  toolBar->addWidget(period);
+  QLabel *locationLabel = new QLabel("Location");
+  locationLabel->setAlignment(Qt::AlignVCenter);
+  toolBar->addWidget(locationLabel);
+  toolBar->addWidget(location);
 
   toolBar->addSeparator();
 
@@ -220,6 +300,7 @@ void WaterWindow::openCSV()
   {
     statsDialog->hide();
   }
+
 }
 
 // this is the function for the table view
