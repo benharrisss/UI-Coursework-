@@ -1,0 +1,91 @@
+// COMP2811 Coursework 1 sample solution: Water class
+
+#pragma once
+
+#include <string>
+#include <iostream>
+
+// need to add getter and setter methods
+// verify this is the our chosen implementation (anyone have a better idea?)
+// use the website to model it
+class SamplingPoint
+{
+public:
+  SamplingPoint(std::string notation, float easting, float northing, std::string label)
+      : notation(notation), easting(easting), northing(northing), label(label) {}
+
+  std::string getNotation() { return notation; }
+  std::string getLabel() { return label; }
+  float getEasting() { return easting; }
+  float getNorthing() { return northing; }
+
+private:
+  std::string notation;
+  float easting;
+  float northing;
+  std::string label;
+};
+
+class Determinand
+{
+public:
+  Determinand(std::string label, std::string definition, std::string notation, std::string unit)
+      : label(label), definition(definition), notation(notation), unit(unit) {}
+  std::string getLabel() { return label; }
+  std::string getDefinition() { return definition; }
+  std::string getNotation() { return notation; }
+  std::string getUnit() { return unit; }
+  friend class Water;
+
+private:
+  std::string label;
+  std::string definition;
+  std::string notation;
+  std::string unit;
+};
+
+class Sample
+{
+private:
+  SamplingPoint samplingPoint;
+  std::string purpose;
+  std::string materialType;
+  std::string dateTime;
+  bool isCompliance;
+
+public:
+  // Constructor
+  Sample(SamplingPoint samplingPoint, std::string purpose, std::string materialType,
+         std::string dateTime, bool isCompliance)
+      : samplingPoint(samplingPoint), purpose(purpose), materialType(materialType),
+        dateTime(dateTime), isCompliance(isCompliance) {}
+  std::string getPurpose() { return purpose; }
+  std::string getMaterialType() { return materialType; }
+  std::string getDateTime() { return dateTime; }
+  bool getIsCompliance() { return isCompliance; }
+  SamplingPoint getSamplingPoint() { return samplingPoint; }
+};
+
+class Water
+{
+private:
+  std::string id;
+  float result;
+  std::string resultQualifier;
+  std::string resultInterpretation;
+  Sample sample;
+  Determinand determinand;
+
+public:
+  Water(const std::string &id, float result, std::string resultQualifier, std::string resultInterpretation,
+        Sample sample, Determinand determinand);
+  std::string getId() { return id; }
+  float getResult() { return result; }
+  std::string getResultQualifier() { return resultQualifier; }
+  std::string getResultInterpretation() { return resultInterpretation; }
+  Determinand getDeterminand() { return determinand; }
+  Sample getSample() { return sample; }
+};
+
+std::ostream &operator<<(std::ostream &, const Water &);
+// formating

@@ -49,7 +49,7 @@ void WaterWindow::createDashboard()
   appTitle->setAlignment(Qt::AlignCenter);
   appTitle->setStyleSheet("font-size: 24px; font-weight: bold;");
 
-  // Pollutant Cards
+  // Cards for each page
   QGridLayout *cardLayout = new QGridLayout;
 
   QStringList categories = {tr("Pollutant Overview"), tr("Persistant Organic Pollutants (POPs)"), tr("Environmental Litter Indicators"), tr("Flourinated Compounds")};
@@ -86,7 +86,7 @@ void WaterWindow::createDashboard()
     }
   }
 
-    // Quick Filters
+    // Filters
     QHBoxLayout *filterLayout = new QHBoxLayout;
     QLabel *filterLabel = new QLabel(tr("Filter By:"));
     QComboBox *timeFilter = new QComboBox();
@@ -109,7 +109,7 @@ void WaterWindow::createDashboard()
     footerLayout->addWidget(helpButton);
     footerLayout->addWidget(creditsButton);
 
-    // Assemble Main Layout
+    // Add alll layouts to main layout
     mainLayout->addWidget(appTitle);
     mainLayout->addLayout(cardLayout);
     mainLayout->addLayout(filterLayout);
@@ -189,13 +189,11 @@ void WaterWindow::createPOPs()
   updateFileSelector(pollutant, pchart->getDeterminands());
   updateFileSelector(location, pchart->getLocations(pollutant->currentText().toStdString()));
 
-  std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
-
-
   // Create a chart and chart view
   pchart->loadDataset(model.getData());
   QChart *chart = new QChart();
   pchart->initChart(chart);
+  formatChart(chart);
   std::cout << "chart created" << std::endl;
   QChartView *chartView = new QChartView(chart);
   layout->addWidget(chartView);
@@ -255,6 +253,7 @@ void WaterWindow::createLitter()
   litterSeries->append(set3);
 
   QChart *litterChart = new QChart;
+  formatChart(litterChart);
   litterChart->addSeries(litterSeries);
   litterChart->setTitle(tr("Average presence of litters in various locations"));
   litterChart->setAnimationOptions(QChart::SeriesAnimations);
@@ -363,6 +362,7 @@ void WaterWindow::createFlourinated()
   fchart->loadDataset(model.getData());
   QChart *chart = new QChart();
   fchart->initChart(chart);
+  formatChart(chart);
   std::cout << "chart created" << std::endl;
   QChartView *chartView = new QChartView(chart);
   layout->addWidget(chartView);
@@ -381,6 +381,15 @@ void WaterWindow::createFlourinated()
   flourinatedWidget->setLayout(layout);
   setCentralWidget(flourinatedWidget);
   
+}
+
+
+void WaterWindow::formatChart(QChart *chart) 
+{
+  chart->setBackgroundBrush(QBrush(QColor("#e0f7fa")));
+  chart->setTitleBrush(QBrush(QColor("#00796b")));
+  chart->setPlotAreaBackgroundBrush(QBrush(QColor("#fefefe")));
+  chart->setPlotAreaBackgroundVisible(true);
 }
 
 void WaterWindow::createPageBar()

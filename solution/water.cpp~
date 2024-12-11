@@ -1,0 +1,55 @@
+// COMP2811 Coursework 1 sample solution: Quake class
+
+#include <stdexcept>
+#include <sstream>
+#include "quake.hpp"
+
+using namespace std;
+
+
+Quake::Quake(const string& id, const string& ssP, const string& ssPn, const string& ssPl, const string& ssDT, const string& dl, const string& dd, 
+            int dn, const string& rQn, const string& rt, const string& cRIi, const string& dul, const string& ssMTl,
+            bool siCS, const string& spl, int ssPea, int ssPno):
+  id(id), sampleSamplingPoint(ssP), samplesamplingPointnotation(ssPn), samplesamplingPointlabel(ssPl), samplesampleDateTime(ssDT), determinandlabel(dl),
+  determinanddefinition(dd), determinandnotation(dn), resultQualifernotation(rQn), result(rt), codedResultInterpretationinterpretation(cRIi), determinandunitlabel(dul),
+  samplesampledMaterialTypelabel(ssMTl), sampleisComplianceSample(siCS), samplepurposelabel(spl), samplesamplingPointeasting(ssPea), samplesamplingPointnorthing(ssPno)
+{
+  ostringstream error;
+
+  if (determinandnotation < MIN_DETERMINAND_NOTATION or determinandnotation > MAX_DETERMINAND_NOTATION) {
+    error << "Invalid Determinand Notation: " << determinandnotation;
+    throw out_of_range(error.str());
+  }
+
+  if (samplesamplingPointeasting < 0) {
+    error << "Invalid easting number: " << samplesamplingPointeasting;
+    throw out_of_range(error.str());
+  }
+
+  if (samplesamplingPointnorthing < 0) {
+    error << "Invalid northing number: " << samplesamplingPointnotation;
+    throw out_of_range(error.str());
+  }
+}
+
+
+ostream& operator<<(ostream& out, const Quake& quake)
+{
+  return out << "Id: " << quake.getId()
+             << "\nSample.samplingPoint: " << quake.getSampleSamplingPoint()
+             << "\nSample.samplingPoint.notation: " << quake.getSamplesamplingPointnotation()
+             << "\nSample.samplingPoint.label: " << quake.getSamplesamplingPointlabel()
+             << "\nSample.sampleDateTime: " << quake.getSamplesampleDateTime()
+             << "\nDeterminand.label: " << quake.getDeterminandlabel()
+             << "\nDeterminand.definition: " << quake.getDeterminanddefinition()
+             << "\nDeterminand.notation: " << quake.getDeterminandnotation()
+             << "\nResultQualifier.notation: " << quake.getResultQualifernotation()
+             << "\nResult: " << quake.getResult()
+             << "\nCodedResultInterpretation.interpretation: " << quake.getCodedResultInterpretationinterpretation()
+             << "\nDeterminand.unit.label: " << quake.getDeterminandunitlabel()
+             << "\nSample.sampledMaterialType.label: " << quake.getSamplesampledMaterialTypelabel()
+             << "\nSample.isComplianceSample: " << quake.getSampleisComplianceSample()
+             << "\nSample.purpose.label: " << quake.getSamplepurposelabel() 
+             << "\nSample.samplingPoint.easting: " << quake.getSamplesamplingPointeasting() 
+             << "\nSample.samplingPoint.northing: " << quake.getSamplesamplingPointnorthing() << endl;
+}

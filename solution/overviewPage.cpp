@@ -36,7 +36,7 @@ void OverviewPage::showOverviewPageExplanation()
 
     std::vector<std::string> pullutantNames = model->getData().getLabels();
     if(pullutantNames.empty()) {
-        std::cout << "what the f" << std::endl;
+        std::cout << "Overview of the page" << std::endl;
     }
     for (const auto& name : pullutantNames){
         std::cout << name << std::endl;

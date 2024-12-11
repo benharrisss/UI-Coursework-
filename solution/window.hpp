@@ -43,6 +43,7 @@ private:
   void addHelpMenu();
   void addPOPMenu();
   void updateFileSelector(QComboBox *selector, QStringList options);
+  void formatChart(QChart *chart);
 
   QWidget* singoltenOverviewPage = nullptr;
 
