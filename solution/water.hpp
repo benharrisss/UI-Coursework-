@@ -1,13 +1,8 @@
-// COMP2811 Coursework 1 sample solution: Water class
-
 #pragma once
 
 #include <string>
 #include <iostream>
 
-// need to add getter and setter methods
-// verify this is the our chosen implementation (anyone have a better idea?)
-// use the website to model it
 class SamplingPoint
 {
 public:
@@ -88,4 +83,3 @@ public:
 };
 
 std::ostream &operator<<(std::ostream &, const Water &);
-// formating

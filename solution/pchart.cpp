@@ -4,6 +4,7 @@
 #include <QString>
 #include <iostream>
 #include <algorithm>
+#include<string>
 
 bool POPChart::check(std::string label)
 {
@@ -14,14 +15,6 @@ bool POPChart::check(std::string label)
     {
         return true;
     }
-    /*else
-    {
-        size_t pos = label.find("per");
-        if (pos != std::string::npos && (pos == 0 || !isalpha(label[pos - 1])))
-        {
-            return true;
-        }
-    }*/
     return false;
 }
 
@@ -34,9 +27,8 @@ QStringList POPChart::getDeterminands()
     {
         Water w = dataset[i];
         std::string label = w.getDeterminand().getLabel();
-        //std::string definition = w.getDeterminand().getDefinition();
         // filter for flourinated compounds
-        if (check(label))// || check(definition))
+        if (check(label))
         {
 
             if (determinands.indexOf(QString::fromStdString(label)) == -1)
@@ -64,9 +56,6 @@ QStringList POPChart::getDeterminands()
 
 QStringList POPChart::getLocations(std::string pollutant)
 {
-    std::cout << "location pollutant" << std::endl;
-    std::cout << pollutant << std::endl;
-
     QStringList locations;
     if (pollutant == "")
     {
@@ -111,11 +100,7 @@ void POPChart::createDataset(WaterDataset data, std::string pollutant)
             time_d.erase(2, 1);
             time_d.erase(4, 1);
             std::string combined_time = time_y + time_d;
-            std::cout << combined_time << std::endl;
-            std::cout << result << std::endl;
             plots.emplace_back(std::stod(combined_time), result);
-
-            std::cout << "appended" << std::endl;
         }
     }
     std::sort(plots.begin(), plots.end(), [](const std::pair<double, double> &a, const std::pair<double, double> &b)
@@ -136,7 +121,7 @@ void POPChart::updateChart(QChart *chart, std::string pollutant)
 
     // Attach axes to the chart and series
     chart->addSeries(series);
-    chart->setTitle(QString::fromStdString(pollutant));
+    chart->setTitle("Sampled level of " + QString::fromStdString(pollutant) + " across all locations");
 }
 
 void POPChart::initChart(QChart *chart)
@@ -144,7 +129,6 @@ void POPChart::initChart(QChart *chart)
     series = new QLineSeries();
     chart->legend()->hide();
     chart->addSeries(series);
-    std::cout << "creating axis " << std::endl;
 
     // logarithmic Y axis
     axisY = new QLogValueAxis();
@@ -156,16 +140,13 @@ void POPChart::initChart(QChart *chart)
 
     // Create a linear X-axis
     axisX = new QValueAxis();
-    axisX->setTitleText("Time");
+    axisX->setTitleText("Time of Sample");
     axisX->setLabelFormat("%.0f");
-    axisX->setTickCount(10);
+    axisX->setTickCount(-1);
+    axisX->setRange(202400000000, 202500000000);
 
-    std::cout << "init chart" << std::endl;
     chart->addAxis(axisX, Qt::AlignBottom);
     chart->addAxis(axisY, Qt::AlignLeft);
-
-    series->attachAxis(axisX);
-    series->attachAxis(axisX);
 
     chart->setTitle("Persistent Organic Pollutants");
 }
@@ -180,31 +161,34 @@ void POPChart::updateCompliance(QLabel *pfaLabel, QLabel *locationLabel,
     float result = 0;
     pfaLabel->setText(QString::fromStdString(pollutant));
     locationLabel->setText(QString::fromStdString(location));
-    std::cout << "determinand: " << pollutant << std::endl;
-    std::cout << "location: " << location << std::endl;
+    int count = 0;
     for (int i = 0; i < dataset.size(); i++)
     {
         Water w = dataset[i];
-        std::cout << i << std::endl;
         if (w.getDeterminand().getLabel() == pollutant && w.getSample().getSamplingPoint().getLabel() == location)
         {
-            result = w.getResult();
-            break;
+            result += w.getResult();
+            count++;
         }
     }
-    // set style sheet
-    std::cout << "result: ";
 
+    result = result / count;
+    // set style sheet
+    std::string style;
     if (result < 0.1)
     {
-        complianceBar->setStyleSheet("background-color: green");
+        style = "background-color: green;";
     }
     else if (result < 0.2)
     {
-        complianceBar->setStyleSheet("background-color: yellow");
+        style = "background-color: yellow;";
     }
     else
     {
-        complianceBar->setStyleSheet("background-color: red");
+        style = "background-color: red;";
     }
+    std::string explanation = "The Average level of " + pollutant + " at " + location + " is " + std::to_string(result);
+    QString explanation_q = QString::fromStdString(explanation);
+    complianceBar->setToolTip(explanation_q);
+    complianceBar->setStyleSheet(QString::fromStdString(style));
 }

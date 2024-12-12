@@ -1,5 +1,3 @@
-// COMP2811 Coursework 2 sample solution: dialog
-// fred
 #include <QtWidgets>
 #include "stats.hpp"
 
@@ -10,14 +8,12 @@ StatsDialog::StatsDialog(QWidget *parent) : QDialog(parent)
   setWindowTitle(tr("Quake Stats"));
 }
 
-// what is this
 void StatsDialog::update(double dep, double mag)
 {
   meanDepth->setText(QString::number(dep, 'f', 1));
   meanMagnitude->setText(QString::number(mag, 'f', 1));
 }
 
-// needs to be changed
 void StatsDialog::createWidgets()
 {
   meanDepth = new QLineEdit("?");

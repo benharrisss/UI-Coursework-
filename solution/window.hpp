@@ -1,5 +1,3 @@
-// COMP2811 Coursework 2 sample solution: main window
-
 #pragma once
 
 #include <QMainWindow>
@@ -46,29 +44,21 @@ private:
   void formatChart(QChart *chart);
 
   QWidget* singoltenOverviewPage = nullptr;
-
   WaterModel model;         // data model used by table
   QString dataLocation;     // location of CSV data files
   QComboBox *pollutant;     // selector for quake feed significance level
   QComboBox *location;      // selector for quake feed time period
   QPushButton *loadButton;  // button to load a new CSV file
-  QPushButton *statsButton; // button to display dataset stats
   QPushButton *dashboardButton;
   QPushButton *overviewButton;
   QPushButton *popsButton;
   QPushButton *litterButton;
   QPushButton *flourinatedButton;
-
-  QToolBar *toolBar; // toolbar for file and data controls
-
+  QToolBar *toolBar;        // toolbar for file and data controls
   QTableView *table;        // table of quake data
   QLabel *fileInfo;         // status bar info on current file
   StatsDialog *statsDialog; // dialog to display stats
-
   QLabel *pollutantName;
-
-  //QWidget *dashboardWidget;
-
   QHBoxLayout *mainLayout;
   QLabel *appTitle;
   QHBoxLayout *headerLayout;
@@ -88,7 +78,6 @@ private:
   QPushButton *creditsButton;
   QLabel *helpLink;
   QMessageBox *helpMessage;
-
   QWidget *popWidget;
   QVBoxLayout *layout;
   QLabel *pfaLabel;
@@ -96,7 +85,6 @@ private:
   QFrame *complianceBar;
   POPChart *pchart;
   QChartView *chartView;
-
   QBarSeries *litterSeries;
   QBarSet *set1;
   QBarSet *set2;
@@ -109,7 +97,6 @@ private:
   QChartView *litterChartView;
   QVBoxLayout *litterLayout;
   QWidget *litter;
-
 
 private slots:
   void setDataLocation();

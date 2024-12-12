@@ -1,13 +1,7 @@
-// COMP2811 Coursework 2: data model
-// fred
 #pragma once
 
 #include <QAbstractTableModel>
 #include "dataset.hpp"
-
-// this is the model class for the Water data
-// has a dataset object to store the data
-// Qvariant data is the header data for the table
 
 // data vector of water objects
 class WaterModel : public QAbstractTableModel
@@ -22,10 +16,6 @@ public:
   QVariant data(const QModelIndex &, int) const;
   QVariant headerData(int, Qt::Orientation, int) const;
   WaterDataset getData() const { return dataset; }
-  /*
-  double meanDepth() const { return dataset.meanDepth(); }
-  double meanMagnitude() const { return dataset.meanMagnitude(); }
-  */
 
 private:
   WaterDataset dataset;

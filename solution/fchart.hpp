@@ -23,15 +23,10 @@ public:
     void updateCompliance(QLabel *pfaLabel, QLabel *locationLabel, QFrame *complianceBar,
                           std::string pollutant, std::string location);
 
-    /*
-    double meanDepth() const { return dataset.meanDepth(); }
-    double meanMagnitude() const { return dataset.meanMagnitude(); }
-    */
-
 private:
     WaterDataset dataset;
-    QLineSeries *series; // set these for now may move to window
-    QChart *chart;       // set these for now may move to window
+    QLineSeries *series;
+    QChart *chart;
     QLogValueAxis *axisY;
     QValueAxis *axisX;
 };

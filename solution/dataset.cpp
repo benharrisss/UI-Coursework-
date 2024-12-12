@@ -1,5 +1,3 @@
-// COMP2811 Coursework 1 sample solution: QuakeDataset class
-// fred
 #include <stdexcept>
 #include <algorithm>
 #include <numeric>
@@ -40,10 +38,7 @@ void WaterDataset::loadData(const string &filename)
     {
       pollutants.push_back(determinand.getLabel());
     }
-    /*if (isCompliance)
-    {
-      std::cout << "Compliance" << endl;
-    }*/
+    
     Sample sample{
         samplingPoint,
         row["sample.purpose.label"].get<string>(),
@@ -60,11 +55,6 @@ void WaterDataset::loadData(const string &filename)
         sample,
         determinand,
     };
-
-    // PollutantResults pollutantResults{
-
-    //}
-
     data.push_back(water);
   }
 }
@@ -76,6 +66,21 @@ vector<pair<string, double>> WaterDataset::getPollutants(const string &pollutant
   {
     if (i.getDeterminand().getLabel() == pollutantName &&
         i.getSample().getSamplingPoint().getLabel() == location)
+    {
+      string date = i.getSample().getDateTime().substr(0, 10);
+      double value = i.getResult();
+      pollutantInfo.push_back({date, value});
+    }
+  }
+  return pollutantInfo;
+}
+
+vector<pair<string, double>> WaterDataset::getPollutants(const string &pollutantName)
+{
+  vector<pair<string, double>> pollutantInfo;
+  for (auto i : data)
+  {
+    if (i.getDeterminand().getLabel() == pollutantName)
     {
       string date = i.getSample().getDateTime().substr(0, 10);
       double value = i.getResult();
@@ -133,51 +138,6 @@ vector<Water> WaterDataset::getPOPs()
   }
   return pops;
 }
-/*
-Quake QuakeDataset::strongest() const
-{
-  checkDataExists();
-
-  auto quake = max_element(data.begin(), data.end(),
-    [](Quake a, Quake b) { return a.getMagnitude() < b.getMagnitude(); });
-
-  return *quake;
-}
-
-
-Quake QuakeDataset::shallowest() const
-{
-  checkDataExists();
-
-  auto quake = min_element(data.begin(), data.end(),
-    [](Quake a, Quake b) { return a.getDepth() < b.getDepth(); });
-
-  return *quake;
-}
-
-
-double QuakeDataset::meanDepth() const
-{
-  checkDataExists();
-
-  auto sum = accumulate(data.begin(), data.end(), 0.0,
-    [](double total, Quake q) { return total + q.getDepth(); });
-
-  return sum / data.size();
-}
-
-
-double QuakeDataset::meanMagnitude() const
-{
-  checkDataExists();
-
-  auto sum = accumulate(data.begin(), data.end(), 0.0,
-    [](double total, Quake q) { return total + q.getMagnitude(); });
-
-  return sum / data.size();
-}
-
-*/
 
 void WaterDataset::checkDataExists() const
 {

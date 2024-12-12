@@ -1,5 +1,3 @@
-// COMP2811 Coursework 2 sample solution: main window
-
 #include <QtWidgets>
 #include <stdexcept>
 #include <iostream>
@@ -47,7 +45,7 @@ void WaterWindow::createDashboard()
   // Header
   QLabel *appTitle = new QLabel(tr("Water Quality Monitor"));
   appTitle->setAlignment(Qt::AlignCenter);
-  appTitle->setStyleSheet("font-size: 24px; font-weight: bold;");
+  appTitle->setStyleSheet("font-size: 24px; font-weight: bold; height: 60px;");
 
   // Cards for each page
   QGridLayout *cardLayout = new QGridLayout;
@@ -133,7 +131,6 @@ void WaterWindow::createTableAndModel()
 
 void WaterWindow::showDataLoadedQuestion()
 {
-  //todo dhejhrfuws
   QMessageBox *msgBox = new QMessageBox(this);
   msgBox->setWindowTitle(tr("Question"));
   msgBox->setText(tr("Do you want to see the loaded data?"));
@@ -151,43 +148,69 @@ void WaterWindow::showDataLoadedQuestion()
 
 void WaterWindow::createOverview()
 {
-  //todo make singolton? for some reasen breaks the code
-  //if(!singoltenOverviewPage) {
+  location->clear();
+  pollutant->clear();
+
   OverviewPage* page = new OverviewPage(this, &model);
   singoltenOverviewPage = page->createOverviewPage();
-  //}
-  //QVBoxLayout* layout = WaterOverviewPage::createOverviewPage();
+
   setCentralWidget(singoltenOverviewPage);
 }
 
 void WaterWindow::createPOPs()
 {
-  setCentralWidget(0);
+  disconnect(pollutant, &QComboBox::currentTextChanged, nullptr, nullptr);
+  disconnect(location, &QComboBox::currentTextChanged, nullptr, nullptr);
+
+  pollutant->clear();
+  location->clear();
 
   QWidget *popWidget = new QWidget();
   QVBoxLayout *layout = new QVBoxLayout();
 
-  QLabel *pfaLabel = new QLabel("label");
-  QLabel *locationLabel = new QLabel("location");
+  QLabel *pfaLabel = new QLabel(tr("Select a pollutant to view data"));
+  pfaLabel->setAlignment(Qt::AlignHCenter);
+  QLabel *locationLabel = new QLabel(tr("Select a location to view the compliance indicator"));
+  pfaLabel->setAlignment(Qt::AlignHCenter);
+  
   QFrame *complianceBar = new QFrame();
+  QHBoxLayout *complianceLayout = new QHBoxLayout();
 
-  complianceBar->setFrameShape(QFrame::HLine);
   complianceBar->setFixedHeight(10);
 
-  layout->addWidget(pfaLabel);
-  layout->addWidget(locationLabel);
-  layout->addWidget(complianceBar);
+  complianceLayout->addWidget(pfaLabel);
+  complianceLayout->addWidget(locationLabel);
+  complianceLayout->addWidget(complianceBar);
+  complianceLayout->setAlignment(Qt::AlignTop);
+  complianceLayout->setDirection(QBoxLayout::TopToBottom);
+
+  QWidget *complianceWidget = new QWidget();
+  complianceWidget->setLayout(complianceLayout);
+  layout->addWidget(complianceWidget);
 
   POPChart *pchart = new POPChart();
   if (model.hasData())
   {
     pchart->loadDataset(model.getData());
   }
+  else
+  {
+    if (dataLocation != "")
+    {
+      openCSV();
+      pchart->loadDataset(model.getData());
+    }
+    else
+    {
+      QMessageBox::critical(this, "Data Error",
+                            "No data has been loaded!\n\n"
+                            "You can load data via the File menu.");
+      return;
+    }
+  }
 
   // Create file selectors specific to this window
-
   updateFileSelector(pollutant, pchart->getDeterminands());
-  updateFileSelector(location, pchart->getLocations(pollutant->currentText().toStdString()));
 
   // Create a chart and chart view
   pchart->loadDataset(model.getData());
@@ -208,6 +231,7 @@ void WaterWindow::createPOPs()
           { pchart->updateCompliance(pfaLabel, locationLabel, complianceBar, pollutant->currentText().toStdString(),
                                      location->currentText().toStdString()); });
   chartView->setChart(chart);
+
   // Set the layout and widget as the central widget
   popWidget->setLayout(layout);
   setCentralWidget(popWidget);
@@ -225,9 +249,8 @@ void WaterWindow::createLitter()
   "WITHERNSEA (08900)", "WHARFE AT WILDERNESS CAR PARK (08904)", "WHARFE AT CROMWHEEL - ILKLEY (08901)",
   "NIDD AT THE LIDO - KNARESBOROUGH (08903)"};
 
-  updateFileSelector(pollutant, litterList);
-  updateFileSelector(location, locationList);
-
+  pollutant->clear();
+  location->clear();
   
   QBarSeries *litterSeries = new QBarSeries();
   QBarSet *set1 = new QBarSet(tr("Bathing Water Profile : Other Litter (incl. plastics)"));
@@ -331,32 +354,59 @@ void WaterWindow::createLitter()
 
 void WaterWindow::createFlourinated()
 {
-  setCentralWidget(0);
+  disconnect(pollutant, &QComboBox::currentTextChanged, nullptr, nullptr);
+  disconnect(location, &QComboBox::currentTextChanged, nullptr, nullptr);
+
+  pollutant->clear();
+  location->clear();
+
   //  Create a container widget for this page
   QWidget *flourinatedWidget = new QWidget();
   QVBoxLayout *layout = new QVBoxLayout();
 
-  QLabel *pfaLabel = new QLabel(tr("label"));
-  QLabel *locationLabel = new QLabel(tr("location"));
+  QLabel *pfaLabel = new QLabel(tr("Select a pollutant to view data"));
+  pfaLabel->setAlignment(Qt::AlignHCenter);
+  QLabel *locationLabel = new QLabel(tr("Select a location to view the compliance indicator"));
+  pfaLabel->setAlignment(Qt::AlignHCenter);
+  
   QFrame *complianceBar = new QFrame();
+  QHBoxLayout *complianceLayout = new QHBoxLayout();
 
-  complianceBar->setFrameShape(QFrame::HLine);
   complianceBar->setFixedHeight(10);
 
-  layout->addWidget(pfaLabel);
-  layout->addWidget(locationLabel);
-  layout->addWidget(complianceBar);
+  complianceLayout->addWidget(pfaLabel);
+  complianceLayout->addWidget(locationLabel);
+  complianceLayout->addWidget(complianceBar);
+  complianceLayout->setAlignment(Qt::AlignTop);
+  complianceLayout->setDirection(QBoxLayout::TopToBottom);
+
+  QWidget *complianceWidget = new QWidget();
+  complianceWidget->setLayout(complianceLayout);
+  layout->addWidget(complianceWidget);
 
   FlourineChart *fchart = new FlourineChart();
   if (model.hasData())
   {
     fchart->loadDataset(model.getData());
   }
+  else
+  {
+    if (dataLocation != "")
+    {
+      openCSV();
+      fchart->loadDataset(model.getData());
+    }
+    else
+    {
+      QMessageBox::critical(this, "Data Error",
+                            "No data has been loaded!\n\n"
+                            "You can load data via the File menu.");
+      return;
+    }
+  }
 
   // Create file selectors specific to this window
-
   updateFileSelector(pollutant, fchart->getDeterminands());
-  updateFileSelector(location, fchart->getLocations(pollutant->currentText().toStdString()));
 
   // Create a chart and chart view
   fchart->loadDataset(model.getData());
@@ -377,6 +427,7 @@ void WaterWindow::createFlourinated()
           { fchart->updateCompliance(pfaLabel, locationLabel, complianceBar, pollutant->currentText().toStdString(),
                                      location->currentText().toStdString()); });
   chartView->setChart(chart);
+
   // Set the layout and widget as the central widget
   flourinatedWidget->setLayout(layout);
   setCentralWidget(flourinatedWidget);
@@ -396,20 +447,17 @@ void WaterWindow::createPageBar()
 {
   QToolBar *pageBar = new QToolBar();
   pageBar->addWidget(dashboardButton);
-  pageBar->addSeparator();
+  QWidget *gap = new QWidget();
+  gap ->setFixedWidth(95);
+  pageBar->addWidget(gap);
   pageBar->addWidget(overviewButton);
   pageBar->addWidget(popsButton);
   pageBar->addWidget(litterButton);
   pageBar->addWidget(flourinatedButton);
-  QComboBox *languageSelector = new QComboBox();
-  languageSelector->addItems({tr("English"), tr("French"), tr("Spanish"), tr("German")});
-  pageBar->addSeparator();
-  pageBar->addWidget(languageSelector);
 
   addToolBar(Qt::TopToolBarArea, pageBar);
 }
 
-// change this
 void WaterWindow::createFileSelectors()
 {
   QStringList pollutantOptions;
@@ -425,14 +473,21 @@ void WaterWindow::createFileSelectors()
 
 void WaterWindow::updateFileSelector(QComboBox *selector, QStringList options)
 {
-  selector->clear();
-  selector->addItems(options);
+  if (selector->count() == 0)
+  {
+    selector->addItems(options);
+  }
+  else
+  {
+    selector->clear();
+    selector->addItems(options);
+  }
 }
 
 void WaterWindow::createButtons()
 {
   loadButton = new QPushButton(tr("Load"));
-  statsButton = new QPushButton(tr("Stats"));
+  loadButton->setObjectName("LoadButton");
   dashboardButton = new QPushButton(tr("Dashboard"));
   overviewButton = new QPushButton(tr("Overview"));
   popsButton = new QPushButton(tr("POPs"));
@@ -440,7 +495,6 @@ void WaterWindow::createButtons()
   flourinatedButton = new QPushButton(tr("Flourinated compounds"));
 
   connect(loadButton, SIGNAL(clicked()), this, SLOT(openCSV()));
-  connect(statsButton, SIGNAL(clicked()), this, SLOT(displayStats()));
   connect(dashboardButton, SIGNAL(clicked()), this, SLOT(createDashboard()));
   connect(overviewButton, SIGNAL(clicked()), this, SLOT(createOverview()));
   connect(popsButton, SIGNAL(clicked()), this, SLOT(createPOPs()));
@@ -457,6 +511,10 @@ void WaterWindow::createToolBar()
   toolBar->addWidget(pollutantLabel);
   toolBar->addWidget(pollutant);
 
+  QWidget *gap = new QWidget();
+  gap ->setFixedWidth(220);
+  toolBar->addWidget(gap);
+
   QLabel *locationLabel = new QLabel(tr("Location"));
   locationLabel->setAlignment(Qt::AlignVCenter);
   toolBar->addWidget(locationLabel);
@@ -465,7 +523,6 @@ void WaterWindow::createToolBar()
   toolBar->addSeparator();
 
   toolBar->addWidget(loadButton);
-  toolBar->addWidget(statsButton);
 
   addToolBar(Qt::LeftToolBarArea, toolBar);
 }
@@ -552,9 +609,6 @@ void WaterWindow::openCSV()
   }
 }
 
-// this is the function for the table view
-// needs to be updated to view from water using stats dialouge
-
 void WaterWindow::displayStats()
 {
   if (model.hasData())
@@ -564,8 +618,6 @@ void WaterWindow::displayStats()
       statsDialog = new StatsDialog(this);
     }
 
-    // statsDialog->update(model.meanDepth(), model.meanMagnitude());
-
     statsDialog->show();
     statsDialog->raise();
     statsDialog->activateWindow();
@@ -574,10 +626,10 @@ void WaterWindow::displayStats()
 
 void WaterWindow::about()
 {
-  QMessageBox::about(this, "About Quake Tool",
-                     "Quake Tool displays and analyzes earthquake data loaded from"
-                     "a CSV file produced by the USGS Earthquake Hazards Program.\n\n"
-                     "(c) 2024 Nick Efford");
+  QMessageBox::about(this, "About Water Tool",
+                     "Water Tool displays and analyzes water data loaded from "
+                     "a CSV file from the Department for Environment Food & Rural Affairs.\n\n"
+                     "(C) 2024 Nick Efford, Ben Harris, Jacob Onion, Fred Mallory-Bains, Yitzchak Kupinsky & Yiwen Jin");
 }
 
 void WaterWindow::createHelpButton()

@@ -1,5 +1,3 @@
-// COMP2811 Coursework 2: application entry point
-// fred
 #include <QtWidgets>
 #include "window.hpp"
 #include <QApplication>

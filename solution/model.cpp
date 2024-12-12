@@ -1,7 +1,5 @@
-// COMP2811 Coursework 2: data model
-// fred
 #include "model.hpp"
-// this is fine don't change
+
 void WaterModel::updateFromFile(const QString &filename)
 {
   beginResetModel();
@@ -9,7 +7,6 @@ void WaterModel::updateFromFile(const QString &filename)
   endResetModel();
 }
 
-// all the attributes (rows) from the dataset need to fix case 2 and 3
 QVariant WaterModel::data(const QModelIndex &index, int role) const
 {
   if (!index.isValid())
@@ -66,7 +63,6 @@ QVariant WaterModel::data(const QModelIndex &index, int role) const
   return QVariant();
 }
 
-// nees to show all the data
 QVariant WaterModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
   if (role != Qt::DisplayRole)

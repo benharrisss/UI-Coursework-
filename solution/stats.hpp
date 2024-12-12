@@ -1,5 +1,3 @@
-// COMP2811 Coursework 2 sample solution: dialog
-
 #pragma once
 
 #include <QDialog>
